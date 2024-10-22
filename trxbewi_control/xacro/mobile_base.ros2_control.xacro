@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
+
+    <xacro:macro name="mobile_base_ros2_control" params="pca9685_dev pca9685_addr use_simulation:=^|false">
+
+        <ros2_control name="mobile_base_ros2_control" type="system">
+
+            <hardware>
+                <xacro:if value="${use_simulation}">
+                    <plugin>ign_ros2_control/IgnitionSystem</plugin>
+                </xacro:if>
+                <xacro:unless value="${use_simulation}">
+                    <plugin>pca9685_hardware_interface/Pca9685SystemHardware</plugin>
+                    <!-- The name of the I2C device -->
+                    <param name="pca9685_dev">${pca9685_dev}</param>
+                    <!-- The adresse used for the PCA9685 communication -->
+                    <param name="pca9685_addr">${pca9685_addr}</param>
+                </xacro:unless>
+            </hardware>
+
+            <joint name="thottle">
+                <command_interface name="velocity"/>
+                <state_interface name="velocity"/>
+                <param name="max_rpm">2500</param>
+            </joint>
+            <joint name="steering">
+                <command_interface name="position"/>
+                <state_interface name="position"/>
+                <param name="max_degrees">180</param>
+            </joint>
+            <joint name="gear">
+                <command_interface name="position"/>
+                <state_interface name="position"/>
+                <param name="max_degrees">180</param>
+            </joint>
+            <joint name="tlock_front">
+                <command_interface name="position"/>
+                <state_interface name="position"/>
+                <param name="max_degrees">180</param>
+            </joint> 
+            <joint name="tlock_rear">
+                <command_interface name="position"/>
+                <state_interface name="position"/>
+                <param name="max_degrees">180</param>
+            </joint>
+        </ros2_control>
+    </xacro:macro>
+</robot>

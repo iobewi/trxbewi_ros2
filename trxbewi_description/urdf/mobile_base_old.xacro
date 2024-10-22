@@ -1,0 +1,372 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- Propriétés de la caisse (body) -->
+    <xacro:property name="body_length" value="0.05" />
+    <xacro:property name="body_width" value="0.08" />
+    <xacro:property name="body_height" value="0.05" />
+
+    <xacro:property name="chassis_a_length" value="0.48" />
+    <xacro:property name="chassis_a_width" value="0.1" />
+    <xacro:property name="chassis_a_height" value="0.11" />
+    <xacro:property name="chassis_a_offset_origin_x" value="-0.015" />
+    <xacro:property name="chassis_a_offset_origin_y" value="0" />
+    <xacro:property name="chassis_a_offset_origin_z" value="${(chassis_a_height / 2)}" />
+
+    <xacro:property name="chassis_b_length" value="0.16" />
+    <xacro:property name="chassis_b_width" value="0.22" />
+    <xacro:property name="chassis_b_height" value="0.08" />
+    <xacro:property name="chassis_b_offset_origin_x" value="0" />
+    <xacro:property name="chassis_b_offset_origin_y" value="0" />
+    <xacro:property name="chassis_b_offset_origin_z" value="${(chassis_b_height / 2)}"  />
+
+    <xacro:property name="chassis_c_length" value="0.48" />
+    <xacro:property name="chassis_c_width" value="0.22" />
+    <xacro:property name="chassis_c_height" value="0.005" />
+    <xacro:property name="chassis_c_offset_origin_x" value="${chassis_a_offset_origin_x}" />
+    <xacro:property name="chassis_c_offset_origin_y" value="0" />
+    <xacro:property name="chassis_c_offset_origin_z" value="${(chassis_c_height / 2)+ 0.08}" />
+
+    <!-- Propriétés des essieux -->
+    <xacro:property name="wheelbase" value="0.31" />
+    <xacro:property name="axle_radius" value="0.005" />
+    <xacro:property name="axle_length" value="0.20" />
+    <xacro:property name="axle_mass" value="1.0" />
+
+    <!-- Propriétés des roues -->
+    <xacro:property name="wheel_radius" value="0.0585" />
+    <xacro:property name="wheel_length" value="0.048" />
+
+    <!-- Propriétés des offset -->
+    <xacro:property name="base_offset_origin_z" value="0.09" />
+    <xacro:property name="body_offset_origin_x" value="0" />
+    <xacro:property name="body_offset_origin_y" value="0" />
+    <xacro:property name="body_offset_origin_z" value="${(body_height / 2)}" />
+    <xacro:property name="axle_offset_origin_x" value="${wheelbase / 2}" />
+    <xacro:property name="axle_offset_origin_y" value="0" />
+    <xacro:property name="axle_offset_origin_z" value="${base_offset_origin_z - (wheel_radius * 2)}" />
+    <xacro:property name="wheel_offset_origin_y" value="0.0" />
+
+    <!-- Corps principal (caisse) -->
+    <link name="body_link">
+        <visual>
+            <geometry>
+                <box size="${body_length} ${body_width} ${body_height}" />
+            </geometry>
+            <origin xyz="${body_offset_origin_x} ${body_offset_origin_y} ${body_offset_origin_z}" rpy="0 0 0" />
+            <material name="blue" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${body_length} ${body_width} ${body_height}" />
+            </geometry>
+            <origin xyz="${body_offset_origin_x} ${body_offset_origin_y} ${body_offset_origin_z}" rpy="0 0 0" />
+        </collision>
+        <xacro:box_inertia m="5.0" l="${gazebo_drift_factor * body_length}"
+            w="${gazebo_drift_factor * body_width}" h="${gazebo_drift_factor * body_height}"
+            xyz="${body_offset_origin_x} ${body_offset_origin_y} ${body_offset_origin_z}"
+            rpy="0 0 0" />
+    </link>
+
+    <!-- Joint entre le châssis et la caisse -->
+    <joint name="base_body_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="body_link" />
+        <origin xyz="0 0 ${base_offset_origin_z}" rpy="0 0 0" />
+        <axis xyz="0 0 0" />
+    </joint>
+
+
+    <link name="chassis_a_link">
+        <visual>
+            <geometry>
+                <box size="${chassis_a_length} ${chassis_a_width} ${chassis_a_height}" />
+            </geometry>
+            <origin xyz="${chassis_a_offset_origin_x} ${chassis_a_offset_origin_y} ${chassis_a_offset_origin_z}" rpy="0 0 0" />
+            <material name="blue" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${chassis_a_length} ${chassis_a_width} ${chassis_a_height}" />
+            </geometry>
+            <origin xyz="${chassis_a_offset_origin_x} ${chassis_a_offset_origin_y} ${chassis_a_offset_origin_z}" rpy="0 0 0" />
+        </collision>
+        <xacro:box_inertia m="5.0" l="${gazebo_drift_factor * chassis_a_length}"
+            w="${gazebo_drift_factor * chassis_a_width}" h="${gazebo_drift_factor * chassis_a_height}"
+            xyz="${chassis_a_offset_origin_x} ${chassis_a_offset_origin_y} ${chassis_a_offset_origin_z}"
+            rpy="0 0 0" />
+    </link>
+
+    <joint name="base_chassis_a_joint" type="fixed">
+        <parent link="body_link" />
+        <child link="chassis_a_link" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <axis xyz="0 0 0" />
+    </joint>
+
+
+
+    <link name="chassis_b_link">
+        <visual>
+            <geometry>
+                <box size="${chassis_b_length} ${chassis_b_width} ${chassis_b_height}" />
+            </geometry>
+            <origin xyz="${chassis_b_offset_origin_x} ${chassis_b_offset_origin_y} ${chassis_b_offset_origin_z}" rpy="0 0 0" />
+            <material name="blue" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${chassis_b_length} ${chassis_b_width} ${chassis_b_height}" />
+            </geometry>
+            <origin xyz="${chassis_b_offset_origin_x} ${chassis_b_offset_origin_y} ${chassis_b_offset_origin_z}" rpy="0 0 0" />
+        </collision>
+        <xacro:box_inertia m="5.0" l="${gazebo_drift_factor * chassis_b_length}"
+            w="${gazebo_drift_factor * chassis_b_width}" h="${gazebo_drift_factor * chassis_b_height}"
+            xyz="${chassis_b_offset_origin_x} ${chassis_b_offset_origin_y} ${chassis_b_offset_origin_z}"
+            rpy="0 0 0" />
+    </link>
+
+    <joint name="base_chassis_b_joint" type="fixed">
+        <parent link="chassis_a_link" />
+        <child link="chassis_b_link" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <axis xyz="0 0 0" />
+    </joint>
+
+    <link name="chassis_c_link">
+        <visual>
+            <geometry>
+                <box size="${chassis_c_length} ${chassis_c_width} ${chassis_c_height}" />
+            </geometry>
+            <origin xyz="${chassis_c_offset_origin_x} ${chassis_c_offset_origin_y} ${chassis_c_offset_origin_z}" rpy="0 0 0" />
+            <material name="blue" />
+        </visual>
+        <collision>
+            <geometry>
+                <box size="${chassis_c_length} ${chassis_c_width} ${chassis_c_height}" />
+            </geometry>
+            <origin xyz="${chassis_c_offset_origin_x} ${chassis_c_offset_origin_y} ${chassis_c_offset_origin_z}" rpy="0 0 0" />
+        </collision>
+        <xacro:box_inertia m="5.0" l="${gazebo_drift_factor * chassis_c_length}"
+            w="${gazebo_drift_factor * chassis_c_width}" h="${gazebo_drift_factor * chassis_c_height}"
+            xyz="${chassis_c_offset_origin_x} ${chassis_c_offset_origin_y} ${chassis_c_offset_origin_z}"
+            rpy="0 0 0" />
+    </link>
+
+    <joint name="base_chassis_c_joint" type="fixed">
+        <parent link="chassis_a_link" />
+        <child link="chassis_c_link" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+    </joint>
+
+    <!-- Essieu avant -->
+    <link name="front_axle">
+        <visual>
+            <geometry>
+                <cylinder radius="${axle_radius}" length="${axle_length}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+            <material name="grey" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${axle_radius}" length="${axle_length}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+        </collision>
+        <xacro:cylinder_inertia m="${axle_mass}" r="${gazebo_drift_factor * axle_radius}"
+            h="${gazebo_drift_factor * axle_length}" xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+    </link>
+
+    <!-- Joint entre la caisse et l'essieu avant -->
+    <joint name="body_front_axle_joint" type="fixed">
+        <parent link="body_link" />
+        <child link="front_axle" />
+        <origin xyz="${axle_offset_origin_x} ${axle_offset_origin_y} ${axle_offset_origin_z}" rpy="0 0 0" />
+    </joint>
+
+    <!-- Essieu arrière -->
+    <link name="rear_axle">
+            <visual>
+                <geometry>
+                <cylinder radius="${axle_radius}" length="${axle_length}" />
+                </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+            <material name="grey" />
+            </visual>
+            <collision>
+                <geometry>
+                <cylinder radius="${axle_radius}" length="${axle_length}" />
+                </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+            </collision>
+        <xacro:cylinder_inertia m="${axle_mass}" r="${gazebo_drift_factor * axle_radius}"
+            h="${gazebo_drift_factor * axle_length}" xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+        </link>
+        
+    <!-- Joint entre la caisse et l'essieu arrière -->
+    <joint name="body_rear_axle_joint" type="fixed">
+        <parent link="body_link" />
+        <child link="rear_axle" />
+        <origin xyz="-${axle_offset_origin_x} ${axle_offset_origin_y} ${axle_offset_origin_z}" rpy="0 0 0" />
+    </joint>
+
+     <!-- Moyeu de roue avant droite (spindle ou fusée) -->
+    <link name="right_front_spindle_link">
+        <visual>
+            <geometry>
+                <cylinder radius="0.015" length="0.04" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <material name="grey" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="0.015" length="0.04" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+        </collision>
+        <inertial>
+            <mass value="0.2" />
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <inertia ixx="0.001" iyy="0.001" izz="0.001" ixy="0" ixz="0" iyz="0" />
+        </inertial>
+    </link>
+
+    <!-- Joint pour la direction (pivote sur l'axe vertical) -->
+    <joint name="front_right_spindle_joint" type="revolute">
+        <parent link="front_portal_axle" />
+        <child link="right_front_spindle_link" />
+        <origin xyz="0 -${axle_length / 2} 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" /> <!-- Pivote autour de l'axe Z pour la direction -->
+        <limit effort="10.0" lower="-0.5" upper="0.5" velocity="1.0" />
+    </joint>
+
+    <!-- Roue avant droite -->
+    <link name="right_front_wheel_link">
+            <visual>
+                <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+                </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+            <material name="grey" />
+            </visual>
+            <collision>
+                <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+                </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+            </collision>
+        <xacro:cylinder_inertia m="1.0" r="${gazebo_drift_factor * wheel_radius}"
+            h="${gazebo_drift_factor * wheel_length}" xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+        </link>
+
+    <!-- Joint entre l'essieu avant et la roue avant droite -->
+    <joint name="front_axle_right_wheel_joint" type="continuous">
+        <parent link="front_axle" />
+        <child link="right_front_wheel_link" />
+        <origin xyz="0 -${axle_length / 2} 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+    </joint>
+
+    <!-- Joint pour la direction (pivote sur l'axe vertical) -->
+    <joint name="front_right_wheel_direction_joint" type="revolute">
+        <parent link="front_axle" />
+        <child link="right_front_wheel_hub" />
+        <origin xyz="0 -${axle_length / 2} 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" /> <!-- Pivote autour de l'axe Z pour la direction -->
+        <limit effort="10.0" lower="-0.5" upper="0.5" velocity="1.0" /> <!-- Limite de rotation pour la direction -->
+    </joint>
+
+    <!-- Roue avant gauche -->
+    <link name="left_front_wheel_link">
+            <visual>
+                <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+                </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+            <material name="grey" />
+            </visual>
+            <collision>
+                <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+                </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+            </collision>
+        <xacro:cylinder_inertia m="1.0" r="${gazebo_drift_factor * wheel_radius}"
+            h="${gazebo_drift_factor * wheel_length}" xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+        </link>
+        
+    <!-- Joint entre l'essieu avant et la roue avant gauche -->
+    <joint name="front_axle_left_wheel_joint" type="continuous">
+        <parent link="front_axle" />
+        <child link="left_front_wheel_link" />
+        <origin xyz="0 ${axle_length / 2} 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+    </joint>
+
+       <!-- Joint pour la direction (pivote sur l'axe vertical) -->
+    <joint name="front_left_wheel_direction_joint" type="revolute">
+        <parent link="front_axle" />
+        <child link="left_front_wheel_hub" />
+        <origin xyz="0 -${axle_length / 2} 0" rpy="0 0 0" />
+        <axis xyz="0 0 1" /> <!-- Pivote autour de l'axe Z pour la direction -->
+        <limit effort="10.0" lower="-0.5" upper="0.5" velocity="1.0" /> <!-- Limite de rotation pour la direction -->
+        </joint>
+
+    <!-- Roue arrière droite -->
+    <link name="right_rear_wheel_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+            <material name="grey" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+        </collision>
+        <xacro:cylinder_inertia m="1.0" r="${gazebo_drift_factor * wheel_radius}"
+            h="${gazebo_drift_factor * wheel_length}" xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+    </link>
+
+    <!-- Joint entre l'essieu arrière et la roue arrière droite -->
+    <joint name="rear_axle_right_wheel_joint" type="continuous">
+        <parent link="rear_axle" />
+        <child link="right_rear_wheel_link" />
+        <origin xyz="0 -${axle_length / 2} 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+    </joint>
+
+    <!-- Roue arrière gauche -->
+    <link name="left_rear_wheel_link">
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+            <material name="grey" />
+        </visual>
+        <collision>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_length}" />
+            </geometry>
+            <origin xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+        </collision>
+        <xacro:cylinder_inertia m="1.0" r="${gazebo_drift_factor * wheel_radius}"
+            h="${gazebo_drift_factor * wheel_length}" xyz="0 0 0" rpy="${pi / 2.0} 0 0" />
+    </link>
+
+    <!-- Joint entre l'essieu arrière et la roue arrière gauche -->
+    <joint name="rear_axle_left_wheel_joint" type="continuous">
+        <parent link="rear_axle" />
+        <child link="left_rear_wheel_link" />
+        <origin xyz="0 ${axle_length / 2} 0" rpy="0 0 0" />
+        <axis xyz="0 1 0" />
+    </joint>
+
+</robot>
