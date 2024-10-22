@@ -19,7 +19,7 @@
     <!-- controller manager and hardware interfaces -->
     <xacro:if value="$(arg use_controllers)">
         <gazebo>
-            <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+            <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
                 <parameters>$(find trxbewi_control)/config/controllers.yaml</parameters>
             </plugin>
         </gazebo>
