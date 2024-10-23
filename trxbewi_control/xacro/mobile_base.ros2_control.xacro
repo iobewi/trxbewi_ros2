@@ -18,16 +18,20 @@
                 </xacro:unless>
             </hardware>
 
-            <joint name="thottle">
+            <joint name="virtual_throttle_joint">
                 <command_interface name="velocity"/>
                 <state_interface name="velocity"/>
+                <state_interface name="position"/>
                 <param name="max_rpm">2500</param>
             </joint>
-            <joint name="steering">
+            <joint name="virtual_steering_joint">
                 <command_interface name="position"/>
                 <state_interface name="position"/>
+                <state_interface name="velocity"/>
                 <param name="max_degrees">180</param>
             </joint>
+            
+            <!--
             <joint name="gear">
                 <command_interface name="position"/>
                 <state_interface name="position"/>
@@ -43,6 +47,7 @@
                 <state_interface name="position"/>
                 <param name="max_degrees">180</param>
             </joint>
+            -->
         </ros2_control>
     </xacro:macro>
 </robot>
