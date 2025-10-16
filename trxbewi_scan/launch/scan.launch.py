@@ -10,16 +10,7 @@ import os
 def generate_launch_description():
     # Declare arguments
     declared_arguments = []
-    declared_arguments.append(
-        DeclareLaunchArgument(
-            "gui",
-            default_value="false",
-            description="ToDo",
-        )
-    )
-
-    # Initialize Arguments
-    gui = LaunchConfiguration("gui")
+ 
 
     pkg_trxbewi_scan = get_package_share_directory("trxbewi_scan")
     params_file = os.path.join(pkg_trxbewi_scan, "config", "config.yaml")
