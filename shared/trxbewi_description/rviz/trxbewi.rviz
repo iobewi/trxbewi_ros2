@@ -155,6 +155,26 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /clicked_point
+    - Class: rviz_default_plugins/LaserScan
+      Name: LaserScan
+      Enabled: true
+      Topic:
+        Value: /scan
+        History Policy: Keep Last
+        Depth: 5
+        Reliability Policy: Best Effort
+        Durability Policy: Volatile
+      Queue Size: 5
+      Size (Pixels): 3
+      Size (m): 0.03
+      Style: Points
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Autocompute Intensity Bounds: true
+      Use rainbow: true
+      Min Intensity: 0
+      Max Intensity: 4096
+      Decay Time: 0
   Transformation:
     Current:
       Class: rviz_default_plugins/TF
