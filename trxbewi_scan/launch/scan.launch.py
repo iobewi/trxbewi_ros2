@@ -18,12 +18,8 @@ def generate_launch_description():
     scan_node = Node(
         package='rplidar_ros',
         executable='rplidar_node',
-        name='rplidar_node',
+        name='scan_a2m12_node',
         parameters=[params_file],
-    ),
-
-    return LaunchDescription(
-        [
-            scan_node,
-        ]
     )
+
+    return LaunchDescription([scan_node])

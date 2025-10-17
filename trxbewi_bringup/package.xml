@@ -15,6 +15,7 @@
   <exec_depend>trxbewi_description</exec_depend>
   <exec_depend>trxbewi_simulation</exec_depend>
   <exec_depend>trxbewi_teleop</exec_depend>
+  <exec_depend>trxbewi_scan</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

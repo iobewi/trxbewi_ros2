@@ -11,6 +11,7 @@ def generate_launch_description():
     pkg_trxbewi_control = get_package_share_directory("trxbewi_control")
     pkg_trxbewi_description = get_package_share_directory("trxbewi_description")
     pkg_trxbewi_teleop = get_package_share_directory("trxbewi_teleop")
+    pkg_trxbewi_scan = get_package_share_directory("trxbewi_scan")
 
     robot_state_publisher = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(pkg_trxbewi_description, 'launch', 'robot_state_publisher.launch.py')),
@@ -23,12 +24,6 @@ def generate_launch_description():
         )
     )
 
-    rviz = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_trxbewi_description, "launch", "rviz.launch.py")
-        )
-    )
-
     teleop = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_trxbewi_teleop, "launch", "teleop.launch.py")
@@ -36,11 +31,17 @@ def generate_launch_description():
         launch_arguments={"gui": "false"}.items(),
     )
 
+    scan = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_trxbewi_scan, "launch", "scan.launch.py")
+        )
+    )
+
     return LaunchDescription(
         [
             robot_state_publisher,
             control,
-            rviz,
+            scan,
             teleop,
         ]
     )

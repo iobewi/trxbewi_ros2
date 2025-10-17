@@ -20,12 +20,14 @@
 
             <joint name="virtual_throttle_joint">
                 <command_interface name="velocity"/>
-                <state_interface name="velocity"/>
+                <param name="port_id">0</param>   
+                <state_interface name="velocity"/> 
                 <state_interface name="position"/>
                 <param name="max_rpm">2500</param>
             </joint>
             <joint name="virtual_steering_joint">
                 <command_interface name="position"/>
+                <param name="port_id">1</param>   
                 <state_interface name="position"/>
                 <state_interface name="velocity"/>
                 <param name="max_degrees">180</param>

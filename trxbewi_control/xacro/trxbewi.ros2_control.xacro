@@ -3,7 +3,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
   
     <!-- parameters -->
-  <xacro:arg name="pca9685_dev" default="/dev/i2c" />
+  <xacro:arg name="pca9685_dev" default="/dev/i2c-1" />
   <xacro:arg name="pca9685_addr" default="0x40" />
 
   <xacro:include filename="$(find trxbewi_control)/xacro/mobile_base.ros2_control.xacro" />
