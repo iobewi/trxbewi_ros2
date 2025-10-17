@@ -13,9 +13,9 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     rviz_config_dir = os.path.join(
-            get_package_share_directory('trxbewi_ihm'),
+            get_package_share_directory('trxbewi_description'),
             'rviz',
-            'trxbewi_ihm.rviz')
+            'trxbewi_view.rviz')
 
 
     return LaunchDescription([
