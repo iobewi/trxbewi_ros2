@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>trxbewi_ihm</name>
+  <version>0.0.1</version>
+  <description>
+    The TRX ros package
+  </description>
+
+  <maintainer email="lionel.orcil@iobewi.com">ORCIL Lionel</maintainer>
+  <author email="ros@iobewi.com">TRX ROS Maintainer</author>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_cmake_auto</buildtool_depend>
+  <buildtool_depend>ament_cmake_ros</buildtool_depend>
+
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+  <exec_depend>ament_index_python</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
