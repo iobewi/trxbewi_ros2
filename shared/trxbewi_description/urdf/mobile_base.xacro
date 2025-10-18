@@ -11,7 +11,10 @@
     <xacro:property name="axle_length" value="0.20" />
     <xacro:property name="wheelbase" value="0.31" />
     <xacro:property name="suspension_travel" value="0.02" />
-        
+    <!-- Pose du LiDAR (ajuste si besoin) -->
+    <xacro:property name="lidar_xyz" value="0.10 0.00 0.15"/>  <!-- +20 cm vers l'avant, +25 cm en hauteur -->
+    <xacro:property name="lidar_rpy" value="0 0 0"/>           <!-- plan de scan XY, +X vers l'avant, +Z up -->
+
 
     <xacro:macro name="axle" params="name radius length mass color origin_x origin_y origin_z">
         <link name="${name}_axle_link">
@@ -218,6 +221,36 @@
         <axis xyz="0 1 0"/>
         <limit effort="10.0" velocity="10.0"/>
         <dynamics damping="0.2"/>
+    </joint>
+
+    <!-- Lien visuel du LiDAR -->
+    <link name="lidar_link">
+    <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <!-- petit cylindre pour symboliser le capteur -->
+        <geometry>
+        <cylinder length="0.03" radius="0.035"/>
+        </geometry>
+        <material name="black"/>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+        <cylinder length="0.03" radius="0.035"/>
+        </geometry>
+    </collision>
+    <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.001" iyy="0.001" izz="0.001" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+    </link>
+
+    <!-- Joint fixe : base_link -> lidar_link -->
+    <joint name="lidar_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+    <origin xyz="${lidar_xyz}" rpy="${lidar_rpy}"/>
     </joint>
 
     <xacro:axle name="front" radius="0.03" length="0.25" mass="1.0" color="black" origin_x="${wheelbase / 2}" origin_y="0" origin_z="0" />
