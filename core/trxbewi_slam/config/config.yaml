@@ -1,0 +1,38 @@
+slam_toolbox:
+  ros__parameters:
+    # frames
+    map_frame: map
+    odom_frame: odom
+    base_frame: base_link
+
+    # entrée capteurs
+    scan_topic: /scan
+    use_scan_matching: true
+    use_imu: false         # passe à true si tu as un IMU (voir imu_topic)
+    imu_topic: /imu/data   # si use_imu=true
+
+    # modes
+    mode: mapping          # "mapping" (online) ou "localization"
+    use_lidar_scan: true
+    resolution: 0.05
+    max_laser_range: 12.0
+    minimum_travel_distance: 0.1
+    minimum_travel_heading: 0.174    # ~10°
+    transform_publish_period: 0.02   # 50 Hz
+    map_update_interval: 1.0
+    enable_interactive_mode: false
+
+    # mises en correspondance
+    scan_buffer_size: 10
+    scan_buffer_maximum_scan_distance: 5.0
+    link_match_minimum_response_fine: 0.1
+    loop_search_maximum_distance: 3.0
+    do_loop_closing: true
+    loop_match_minimum_chain_size: 10
+    loop_match_maximum_variance_coarse: 3.0
+    loop_match_minimum_response_coarse: 0.35
+    loop_match_minimum_response_fine: 0.45
+
+    # QoS (utile si le driver est en "sensor data")
+    use_qos: true
+    qos_scan: SENSOR_DATA
