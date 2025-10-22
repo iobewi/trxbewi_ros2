@@ -23,19 +23,19 @@ def generate_launch_description():
 
     pkg_trxbewi_teleop = get_package_share_directory("trxbewi_teleop")
     params_file = os.path.join(pkg_trxbewi_teleop, "config", "config.yaml")
-    teleop_pub = "/wheel_controller/cmd_vel_unstamped"
+    teleop_pub = "/wheel_controller/reference"
 
     joy_node = Node(
         package="joy",
         executable="joy_node",
-        name="joy_node",
-        parameters=[{"deadzone": 0.05, "autorepeat_rate": 30.0}],
+        name="trxbewi_joy_node",
+        parameters=[params_file],
     )
 
     teleop_node = Node(
         package="teleop_twist_joy",
         executable="teleop_node",
-        name="teleop_twist_wheel_joy_node",
+        name="trxbewi_teleop_node",
         parameters=[params_file],
         remappings=[
             ("/cmd_vel", teleop_pub),
