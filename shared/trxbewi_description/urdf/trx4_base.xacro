@@ -127,7 +127,8 @@
       </collision>
     </link>
 
-    <joint name="${side}_susp_joint" type="prismatic">
+    <!-- <joint name="${side}_susp_joint" type="prismatic"> -->
+    <joint name="${side}_susp_joint" type="fixed">
       <parent link="chassis"/>
       <child  link="${side}_susp_link"/>
       <!-- placement de l’essieu -->
