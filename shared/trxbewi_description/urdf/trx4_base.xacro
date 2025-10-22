@@ -1,0 +1,287 @@
+<?xml version="1.0"?>
+<robot name="front_axle" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- =======================
+       PARAMÈTRES GÉNÉRIQUES
+       ======================= -->
+  <xacro:property name="track"               value="0.2"/>   <!-- voie (m) -->
+  <xacro:property name="wheelbase"           value="0.31"/>
+  <xacro:property name="wheel_radius"        value="0.0585"/>
+  <xacro:property name="wheel_width"         value="0.048"/>
+  <xacro:property name="hub_offset_y"        value="${track/2.0}"/>
+  <xacro:property name="upright_height"      value="0.010"/>   <!-- hauteur porte-moyeu -->
+  <xacro:property name="susp_travel"         value="0.025"/>   <!-- débattement -->
+  <xacro:property name="kingpin_tilt_deg"    value="5.0"/>    <!-- inclinaison (SIA) -->
+  <xacro:property name="chassis_length"      value="0.48" />
+  <xacro:property name="chassis_width"       value="0.22" />
+  <xacro:property name="chassis_height"      value="0.13" />
+  <xacro:property name="mat_color"           value="0.7 0.7 0.7 1.0"/>
+    <!-- Pose du LiDAR  -->
+  <xacro:property name="lidar_xyz" value="0.10 0.00 0.15"/>  
+  <xacro:property name="lidar_rpy" value="0 0 0"/>           
+
+  <!-- ===== CHASSIS (référence du train avant) ===== -->
+  <link name="chassis">
+    <visual>
+      <origin xyz="-0.02 0 0.04" rpy="0 0 0" />
+      <geometry> <box size="${chassis_length} 0.07 0.04" /></geometry>
+      <material name="metal"><color rgba="${mat_color}"/></material>
+    </visual>
+    <visual>
+      <origin xyz="-0.025 0 0.08" rpy="0 0 0" />
+      <geometry> <box size="0.35 0.085 0.04" /></geometry>
+      <material name="metal"><color rgba="${mat_color}"/></material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 ${(0.06 / 2)}" rpy="0 0 0" />
+      <geometry> <box size="0.16 ${chassis_width} 0.06" /></geometry>
+      <material name="metal"><color rgba="${mat_color}"/></material>
+    </visual>
+    <visual>
+      <origin xyz="-0.02 0 ${(0.005 / 2) + 0.06}" rpy="0 0 0" />
+      <geometry> <box size="${chassis_length}  ${chassis_width} 0.005" /></geometry>
+      <material name="metal"><color rgba="${mat_color}"/></material>
+    </visual>
+    <visual>
+      <origin xyz="-0.15 0 ${0.06 + 0.06}" rpy="0 0 0" />
+      <geometry> <box size="0.07 0.04 0.06" /></geometry>
+      <material name="metal"><color rgba="${mat_color}"/></material>
+    </visual>
+    <visual>
+      <origin xyz="-0.04 0 ${0.05 + 0.06}" rpy="0 0 0" />
+      <geometry> <box size="0.1 0.1 0.06" /></geometry>
+      <material name="metal"><color rgba="${mat_color}"/></material>
+    </visual>
+    <collision>
+      <origin xyz="-0.02 0 ${chassis_height / 2}" rpy="0 0 0" />
+      <geometry> <box size="${chassis_length} ${chassis_width} ${chassis_height}" /></geometry>
+    </collision>
+    <inertial>
+      <mass value="5.0"/>
+      <origin xyz="-0.02 0 ${chassis_height/2}" rpy="0 0 0"/>
+      <!-- Ixx = m/12 (W^2 + H^2), Iyy = m/12 (L^2 + H^2), Izz = m/12 (L^2 + W^2) -->
+      <inertia
+        ixx="${5.0/12.0 * (pow(chassis_width,2) + pow(chassis_height,2))}"
+        iyy="${5.0/12.0 * (pow(chassis_length,2) + pow(chassis_height,2))}"
+        izz="${5.0/12.0 * (pow(chassis_length,2) + pow(chassis_width,2))}"
+        ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <!-- ===== GÉNÉRATEUR ROUE+PORTE-MOYEU AV/ARR =====
+      params:
+        - side   : identifiant unique (ex: front_left, rear_right)
+        - sign   : -1 (gauche) / +1 (droite)
+        - steer  : true (pivot de direction) / false (rigide)
+        - axle_x : position de l’essieu sur X (m)
+  -->
+  <xacro:macro name="wheel_side" params="side sign steer:=true axle_x:=0.0">
+
+    <!-- Coulisse de suspension -->
+    <link name="${side}_susp_link">
+      <inertial><mass value="5.0"/>
+        <inertia ixx="0.2" ixy="0" ixz="0" iyy="0.2" iyz="0" izz="0.2"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry><cylinder length="${susp_travel}" radius="0.0015"/></geometry>
+        <material name="metal"><color rgba="${mat_color}"/></material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0"/>
+        <geometry><cylinder length="${susp_travel}" radius="0.0015"/></geometry>
+      </collision>
+    </link>
+
+    <joint name="${side}_susp_joint" type="prismatic">
+      <parent link="chassis"/>
+      <child  link="${side}_susp_link"/>
+      <!-- placement de l’essieu -->
+      <origin xyz="${axle_x} ${sign * hub_offset_y} -0.015" rpy="0 0 0"/>
+      <axis xyz="0 0 1"/>
+      <limit lower="-${susp_travel/2.0}" upper="${susp_travel/2.0}" effort="5000" velocity="1.0"/>
+      <dynamics damping="50.0" friction="0.0"/>
+    </joint>
+
+    <!-- Porte-moyeu -->
+    <link name="${side}_upright">
+      <inertial><mass value="8.0"/>
+        <inertia ixx="0.4" ixy="0" ixz="0" iyy="0.5" iyz="0" izz="0.3"/>
+      </inertial>
+      <visual>
+        <geometry><box size="0.02 ${upright_height} ${upright_height}"/></geometry>
+        <material name="metal"><color rgba="${mat_color}"/></material>
+      </visual>
+      <collision><geometry><box size="0.02 ${upright_height} ${upright_height}"/></geometry></collision>
+    </link>
+
+    <!-- Pivot de direction (optionnel) -->
+    <xacro:if value="${steer}">
+      <joint name="${side}_steer_joint" type="revolute">
+        <parent link="${side}_susp_link"/>
+        <child  link="${side}_upright"/>
+        <origin xyz="0 0 0" rpy="0 0 ${radians(sign * kingpin_tilt_deg)}"/>
+        <axis xyz="0 0 1"/>
+        <limit lower="${radians(-35)}" upper="${radians(35)}" effort="800" velocity="${radians(180)}"/>
+        <dynamics damping="5.0" friction="0.2"/>
+      </joint>
+    </xacro:if>
+    <xacro:unless value="${steer}">
+      <!-- pas de direction : liaison rigide -->
+      <joint name="${side}_steer_joint" type="fixed">
+        <parent link="${side}_susp_link"/>
+        <child  link="${side}_upright"/>
+      </joint>
+    </xacro:unless>
+
+    <!-- Roue -->
+    <link name="${side}_wheel">
+      <visual>
+        <origin xyz="0 0 0" rpy="${radians(90)} 0 0"/>
+        <geometry><cylinder length="${wheel_width}" radius="${wheel_radius}"/></geometry>
+        <material name="rubber"><color rgba="0.05 0.05 0.05 1.0"/></material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${radians(90)} 0 0"/>
+        <geometry><cylinder length="${wheel_width}" radius="${wheel_radius}"/></geometry>
+      </collision>
+      <inertial>
+        <mass value="0.1"/>
+        <!-- Cylindre axe Y : I_y = 1/2 m r^2 ; I_x = I_z = 1/12 m (3 r^2 + L^2) -->
+        <inertia
+          ixx="${0.1/12.0 * (3*pow(wheel_radius,2) + pow(wheel_width,2))}"
+          iyy="${0.5 * 0.1 * pow(wheel_radius,2)}"
+          izz="${0.1/12.0 * (3*pow(wheel_radius,2) + pow(wheel_width,2))}"
+          ixy="0" ixz="0" iyz="0"/>
+      </inertial>
+    </link>
+
+    <joint name="${side}_wheel_spin_joint" type="continuous">
+      <parent link="${side}_upright"/>
+      <child  link="${side}_wheel"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <axis xyz="0 1 0"/>
+      <dynamics damping="0.01" friction="0.05"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Lien visuel du LiDAR -->
+  <link name="lidar_link">
+    <visual>
+        <origin xyz="0 0 -0.005" rpy="0 0 0"/>
+        <!-- petit cylindre pour symboliser le capteur -->
+        <geometry>
+        <cylinder length="0.03" radius="0.035"/>
+        </geometry>
+        <material name="metal"><color rgba="${mat_color}"/></material>
+    </visual>
+    <visual>
+      <origin xyz="0 0 -0.04" rpy="0 0 0"/>
+      <!-- petit cylindre pour symboliser le capteur -->
+      <geometry>
+      <cylinder length="0.05" radius="0.040"/>
+      </geometry>
+      <material name="metal"><color rgba="${mat_color}"/></material>
+    </visual>
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+        <cylinder length="0.07" radius="0.04"/>
+        </geometry>
+    </collision>
+    <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.001" iyy="0.001" izz="0.001" ixy="0" ixz="0" iyz="0"/>
+    </inertial>
+  </link>
+
+  <!-- Joint fixe : base_link -> lidar_link -->
+  <joint name="lidar_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="lidar_link"/>
+    <origin xyz="${lidar_xyz}" rpy="${lidar_rpy}"/>
+  </joint>
+
+    <!-- Lien visuel CAM -->
+  <link name="cam_link">
+    <visual>
+        <origin xyz="0 0 0" rpy="0 ${radians(90)} 0"/>
+        <!-- petit cylindre pour symboliser le capteur -->
+        <geometry>
+        <cylinder length="0.005" radius="0.01"/>
+        </geometry>
+        <material name="metal"><color rgba="${mat_color}"/></material>
+    </visual>
+    <visual>
+      <origin xyz="-0.0125 0 -0.005" rpy="0 0 0" />
+      <geometry> <box size="0.025 0.035 0.040" /></geometry>
+      <material name="metal"><color rgba="${mat_color}"/></material>
+    </visual>
+  </link>
+
+  <!-- Joint fixe : base_link -> lidar_link -->
+  <joint name="cam_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="cam_link"/>
+    <origin xyz="0.17 0 0.12" rpy="0 ${radians(2)}  0" />
+  </joint>
+
+  <!-- Lien visuel du IMU -->
+  <link name="imu_link">
+    <visual>
+      <geometry> <box size="0.015 0.040 0.01" /></geometry>
+      <material name="metal"><color rgba="${mat_color}"/></material>
+    </visual>
+  </link>
+
+  <!-- Joint fixe : base_link -> lidar_link -->
+  <joint name="imu_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="imu_link"/>
+    <origin xyz="0.025 0 0.09" rpy="0 0 0"/>
+  </joint>
+
+  <!-- ====== INSTANCIATIONS AVANT GAUCHE/DROITE ====== -->
+  <xacro:wheel_side side="front_left"  sign="-1" steer="true"  axle_x="${wheelbase/2}"/>
+  <xacro:wheel_side side="front_right" sign="1"  steer="true"  axle_x="${wheelbase/2}"/>
+
+  <!-- ====== INSTANCIATIONS ARRIERE GAUCHE/DROITE ====== -->
+  <xacro:wheel_side side="rear_left"   sign="-1" steer="false" axle_x="-${wheelbase/2}"/>
+  <xacro:wheel_side side="rear_right"  sign="1"  steer="false" axle_x="-${wheelbase/2}"/>
+
+<!-- ========= GAZEBO CLASSIC : ressorts/amortisseurs ========= -->
+<!-- Rappel : ces tags <gazebo reference="..."> ne marchent que dans Gazebo Classic.
+     Pour ros_gz_sim (Ignition/Harmonic), il faut passer en SDF ou plugins dédiés. -->
+
+<!-- 4 suspensions (prismatiques Z) : k et c adaptés aux petites masses -->
+<gazebo reference="front_left_susp_joint">
+  <spring_reference>0.0</spring_reference>      <!-- position de repos (m) -->
+  <spring_stiffness>800.0</spring_stiffness>    <!-- k en N/m -->
+  <damping>20.0</damping>                       <!-- c en N·s/m -->
+</gazebo>
+<gazebo reference="front_right_susp_joint">
+  <spring_reference>0.0</spring_reference>
+  <spring_stiffness>800.0</spring_stiffness>
+  <damping>20.0</damping>
+</gazebo>
+<gazebo reference="rear_left_susp_joint">
+  <spring_reference>0.0</spring_reference>
+  <spring_stiffness>800.0</spring_stiffness>
+  <damping>20.0</damping>
+</gazebo>
+<gazebo reference="rear_right_susp_joint">
+  <spring_reference>0.0</spring_reference>
+  <spring_stiffness>800.0</spring_stiffness>
+  <damping>20.0</damping>
+</gazebo>
+
+<!-- ========= CONTACT PNEUS (friction) ========= -->
+<!-- Appliqué au link entier (toutes collisions du link) -->
+<gazebo reference="front_left_wheel"><mu1>1.2</mu1><mu2>1.2</mu2><kp>1e5</kp><kd>1.0</kd><minDepth>0.001</minDepth></gazebo>
+<gazebo reference="front_right_wheel"><mu1>1.2</mu1><mu2>1.2</mu2><kp>1e5</kp><kd>1.0</kd><minDepth>0.001</minDepth></gazebo>
+<gazebo reference="rear_left_wheel"><mu1>1.2</mu1><mu2>1.2</mu2><kp>1e5</kp><kd>1.0</kd><minDepth>0.001</minDepth></gazebo>
+<gazebo reference="rear_right_wheel"><mu1>1.2</mu1><mu2>1.2</mu2><kp>1e5</kp><kd>1.0</kd><minDepth>0.001</minDepth></gazebo>
+
+
+</robot>
