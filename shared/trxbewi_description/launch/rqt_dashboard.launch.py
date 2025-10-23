@@ -9,7 +9,7 @@ from ament_index_python.packages import get_package_share_directory
 from pathlib import Path
 
 def generate_launch_description():
-    
+
     pkg_trxbewi_description = get_package_share_directory('trxbewi_description')
     rqt_config_path = os.path.join(pkg_trxbewi_description, "rqt/trxbewi_dashboard.perspective")
 
@@ -36,7 +36,6 @@ def generate_launch_description():
     delayed_rqt = TimerAction(period=1.0, actions=[rqt])
 
     return LaunchDescription([
-        perspective_arg,
         env_scale,
         delayed_rqt
     ])
