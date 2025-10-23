@@ -6,8 +6,8 @@ camera_node:
 
     # Format et timing
     format: "RGB888"    # ex: RGB888, YUYV, MJPEG, etc. (selon capteur/driver)
-    width: 1280
-    height: 720
+    width: 854
+    height: 480
     framerate: 30
 
     # Rôle libcamera (généralement "video")
