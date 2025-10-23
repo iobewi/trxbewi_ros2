@@ -8,6 +8,6 @@ endif()
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
 
-ament_auto_package(INSTALL_TO_SHARE config launch camera_info)
-
 ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/env-hooks/99_libcamera_prepend.sh.in")
+
+ament_auto_package(INSTALL_TO_SHARE config launch camera_info)
