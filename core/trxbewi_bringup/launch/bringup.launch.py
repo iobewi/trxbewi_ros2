@@ -12,6 +12,7 @@ def generate_launch_description():
     pkg_trxbewi_description = get_package_share_directory("trxbewi_description")
     pkg_trxbewi_teleop = get_package_share_directory("trxbewi_teleop")
     pkg_trxbewi_scan = get_package_share_directory("trxbewi_scan")
+    pkg_trxbewi_cam = get_package_share_directory("trxbewi_cam")
 
     robot_state_publisher = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(pkg_trxbewi_description, 'launch', 'robot_state_publisher.launch.py')),
@@ -37,11 +38,18 @@ def generate_launch_description():
         )
     )
 
+    cam = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_trxbewi_cam, "launch", "cam.launch.py")
+        )
+    )
+
     return LaunchDescription(
         [
             robot_state_publisher,
             control,
             scan,
+            cam,
             teleop,
         ]
     )
